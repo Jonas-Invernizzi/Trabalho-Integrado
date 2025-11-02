@@ -20,7 +20,7 @@ spl_autoload_register(function($nomeDaClasse){
 });
 
 $method = $_SERVER['REQUEST_METHOD'];
-$urlBase = '/pw2/poo/0714/';
+$urlBase = '/GitHub/Trabalho-Integrado/';
 $url = str_ireplace($urlBase, '', $_SERVER['REQUEST_URI']);
 $partes = explode("/", $url);
 if ($method === 'POST' && count($partes) != 1) {
