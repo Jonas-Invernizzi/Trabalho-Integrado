@@ -5,7 +5,7 @@ class Banco {
     static function getConexao(){
         if (!self::$pdo) {
             try {
-                self::$pdo = new PDO("mysql:dbname=pw2;host=localhost",'root', '');
+                self::$pdo = new PDO("mysql:dbname=NAPNE;host=localhost",'root', '');
             }catch(Exception $e){
                 die("Erro ao conectar com o banco de dados");
             }
