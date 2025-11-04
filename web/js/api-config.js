@@ -43,30 +43,84 @@ const API_CONFIG = {
         try {
             const response = await fetch(url, options);
             
+            // Ler o texto da resposta uma única vez
+            const text = await response.text();
+            
             if (!response.ok) {
                 let errorMessage = 'Erro na requisição';
                 try {
-                    const result = await response.json();
-                    errorMessage = result.error || errorMessage;
+                    // Tentar fazer parse do JSON para obter mensagem de erro
+                    if (text && text.trim() !== '' && text.trim().startsWith('{')) {
+                        const result = JSON.parse(text);
+                        errorMessage = result.error || errorMessage;
+                    } else if (text && text.trim() !== '') {
+                        // Se não for JSON, usar o texto como mensagem de erro
+                        errorMessage = text.trim();
+                    }
                 } catch (e) {
                     // Se não conseguir fazer parse do JSON, usar o texto da resposta
-                    const text = await response.text();
-                    errorMessage = text || errorMessage;
+                    errorMessage = (text && text.trim() !== '') ? text.trim() : `Erro HTTP ${response.status}`;
                 }
-                throw new Error(errorMessage);
+                const error = new Error(errorMessage);
+                error.status = response.status;
+                throw error;
             }
             
             // Tentar fazer parse do JSON
-            try {
-                const result = await response.json();
-                return result;
-            } catch (e) {
-                // Se não for JSON, retornar texto vazio ou array vazio
-                return [];
+            const contentType = response.headers.get('content-type');
+            
+            // Verificar se a resposta está vazia
+            if (!text || text.trim() === '') {
+                return null;
+            }
+            
+            // Se o content-type indica JSON, tentar fazer parse
+            if (contentType && contentType.includes('application/json')) {
+                try {
+                    // Verificar se o texto começa com { ou [ (JSON válido)
+                    const trimmedText = text.trim();
+                    if (trimmedText.startsWith('{') || trimmedText.startsWith('[')) {
+                        const result = JSON.parse(trimmedText);
+                        return result;
+                    } else {
+                        // Se não começa com { ou [, não é JSON válido
+                        console.warn('Resposta não é JSON válido:', trimmedText.substring(0, 100));
+                        return null;
+                    }
+                } catch (e) {
+                    // Se o parse falhar, logar o erro mas não quebrar
+                    console.error('Erro ao fazer parse do JSON:', e.message, 'Texto recebido:', text.substring(0, 200));
+                    return null;
+                }
+            } else {
+                // Se não for JSON, retornar o texto da resposta
+                return text || null;
             }
         } catch (error) {
-            console.error('Erro na requisição:', error);
-            throw error;
+            // Melhorar tratamento de erro para evitar SyntaxError
+            let errorMessage = 'Erro na requisição';
+            
+            if (error instanceof SyntaxError) {
+                errorMessage = 'Erro ao processar resposta do servidor. A resposta não é um JSON válido.';
+            } else if (error instanceof TypeError && error.message.includes('JSON')) {
+                errorMessage = 'Erro ao processar resposta do servidor.';
+            } else if (error instanceof Error) {
+                errorMessage = error.message || errorMessage;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            
+            // Log detalhado apenas em desenvolvimento
+            if (error.status) {
+                errorMessage = `Erro ${error.status}: ${errorMessage}`;
+            }
+            
+            console.error('Erro na requisição:', errorMessage);
+            const finalError = new Error(errorMessage);
+            if (error.status) {
+                finalError.status = error.status;
+            }
+            throw finalError;
         }
     },
     

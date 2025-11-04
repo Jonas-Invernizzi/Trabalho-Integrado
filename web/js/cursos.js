@@ -62,8 +62,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 courseName: 'Geral'
             }));
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
-            showToast('Erro ao carregar dados do servidor', 'error');
+            // Melhorar tratamento de erro
+            let errorMessage = 'Erro ao carregar dados do servidor';
+            
+            if (error instanceof SyntaxError) {
+                errorMessage = 'Erro ao processar resposta do servidor. Tente novamente.';
+            } else if (error instanceof TypeError && error.message.includes('JSON')) {
+                errorMessage = 'Erro ao processar dados recebidos.';
+            } else if (error instanceof Error) {
+                errorMessage = error.message || errorMessage;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            }
+            
+            // Log detalhado do erro
+            console.error('Erro ao carregar dados:', errorMessage, error);
+            
+            // Mostrar mensagem amigável ao usuário
+            showToast(errorMessage, 'error');
+            
+            // Inicializar arrays vazios para evitar erros
             courses = [];
             subjects = [];
         }

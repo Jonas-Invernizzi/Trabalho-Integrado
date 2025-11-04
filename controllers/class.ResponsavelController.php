@@ -18,22 +18,35 @@ class ResponsavelController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $r = new Responsavel();
-        $r->setNomeResponsavel($_POST['nome_responsavel']);
-        $r->setCpfResponsavel($_POST['cpf_responsavel']);
-        $r->setContatoResponsavel($_POST['contato_responsavel']);
-        $r->setEnderecoResponsavel($_POST['endereco_responsavel']);
+        $r->setNomeResponsavel($dados['nome_responsavel'] ?? $dados['nomeResponsavel'] ?? '');
+        $cpf = str_replace(['.', '-'], '', $dados['cpf_responsavel'] ?? $dados['cpfResponsavel'] ?? '');
+        $r->setCpfResponsavel($cpf);
+        $r->setContatoResponsavel($dados['contato_responsavel'] ?? $dados['contatoResponsavel'] ?? '');
+        $r->setEnderecoResponsavel($dados['endereco_responsavel'] ?? $dados['enderecoResponsavel'] ?? '');
         return $this->dao->inserir($r);
     }
 
     function editar($id) {
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $r = new Responsavel();
-        $r->setNomeResponsavel($dados->nome_responsavel);
-        $r->setCpfResponsavel($dados->cpf_responsavel);
-        $r->setContatoResponsavel($dados->contato_responsavel);
-        $r->setEnderecoResponsavel($dados->endereco_responsavel);
+        $r->setNomeResponsavel($dados['nome_responsavel'] ?? $dados['nomeResponsavel'] ?? '');
+        $cpf = str_replace(['.', '-'], '', $dados['cpf_responsavel'] ?? $dados['cpfResponsavel'] ?? '');
+        $r->setCpfResponsavel($cpf);
+        $r->setContatoResponsavel($dados['contato_responsavel'] ?? $dados['contatoResponsavel'] ?? '');
+        $r->setEnderecoResponsavel($dados['endereco_responsavel'] ?? $dados['enderecoResponsavel'] ?? '');
         return $this->dao->editar($id, $r);
     }
 

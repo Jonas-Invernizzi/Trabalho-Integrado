@@ -227,7 +227,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 cargaHoraria: s.carga_horaria
             }));
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
+            let errorMessage = 'Erro ao carregar dados do servidor';
+            
+            if (error instanceof SyntaxError) {
+                errorMessage = 'Erro ao processar resposta do servidor. Tente novamente.';
+            } else if (error instanceof Error) {
+                errorMessage = error.message || errorMessage;
+            }
+            
+            console.error('Erro ao carregar dados:', errorMessage, error);
             students = [];
             courses = [];
             teachers = [];

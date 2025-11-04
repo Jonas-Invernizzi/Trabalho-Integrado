@@ -47,7 +47,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Filtrar apenas professores (tipo = 'Docente')
             teachers = servidores.filter(s => s.tipo === 'Docente');
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
+            let errorMessage = 'Erro ao carregar dados do servidor';
+            
+            if (error instanceof SyntaxError) {
+                errorMessage = 'Erro ao processar resposta do servidor. Tente novamente.';
+            } else if (error instanceof Error) {
+                errorMessage = error.message || errorMessage;
+            }
+            
+            console.error('Erro ao carregar dados:', errorMessage, error);
             students = [];
             teachers = [];
             courses = [];

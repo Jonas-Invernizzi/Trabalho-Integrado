@@ -18,20 +18,33 @@ class MatriculaController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $m = new Matricula();
-        $m->setEstudanteId($_POST['estudante_id']);
-        $m->setCursoId($_POST['curso_id']);
-        $m->setAtivo($_POST['ativo']);
+        $m->setMatricula($dados['matricula'] ?? '');
+        $m->setEstudanteId($dados['estudante_id'] ?? $dados['estudanteId'] ?? null);
+        $m->setCursoId($dados['curso_id'] ?? $dados['cursoId'] ?? null);
+        $m->setAtivo($dados['ativo'] ?? $dados['active'] ?? true);
         return $this->dao->inserir($m);
     }
 
     function editar($id) {
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $m = new Matricula();
-        $m->setEstudanteId($dados->estudante_id);
-        $m->setCursoId($dados->curso_id);
-        $m->setAtivo($dados->ativo);
+        $m->setMatricula($id); // Manter a matrícula original
+        $m->setEstudanteId($dados['estudante_id'] ?? $dados['estudanteId'] ?? null);
+        $m->setCursoId($dados['curso_id'] ?? $dados['cursoId'] ?? null);
+        $m->setAtivo($dados['ativo'] ?? $dados['active'] ?? true);
         return $this->dao->editar($id, $m);
     }
 

@@ -49,8 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: t.tipo
             }));
         } catch (error) {
-            console.error('Erro ao carregar professores:', error);
-            showToast('Erro ao carregar dados do servidor', 'error');
+            let errorMessage = 'Erro ao carregar dados do servidor';
+            
+            if (error instanceof SyntaxError) {
+                errorMessage = 'Erro ao processar resposta do servidor. Tente novamente.';
+            } else if (error instanceof Error) {
+                errorMessage = error.message || errorMessage;
+            }
+            
+            console.error('Erro ao carregar professores:', errorMessage, error);
+            showToast(errorMessage, 'error');
             teachers = [];
         }
     }

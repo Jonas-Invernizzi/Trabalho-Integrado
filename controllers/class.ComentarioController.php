@@ -18,20 +18,31 @@ class ComentarioController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $c = new Comentario();
-        $c->setParecerId($_POST['parecer_id']);
-        $c->setUsuarioId($_POST['usuario_id']);
-        $c->setComentarios($_POST['comentarios']);
+        $c->setParecerId($dados['parecer_id'] ?? $dados['parecerId'] ?? null);
+        $c->setUsuarioId($dados['usuario_id'] ?? $dados['usuarioId'] ?? null);
+        $c->setComentarios($dados['comentarios'] ?? $dados['comentario'] ?? '');
         return $this->dao->inserir($c);
     }
 
     function editar($id) {
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $c = new Comentario();
-        $c->setParecerId($dados->parecer_id);
-        $c->setUsuarioId($dados->usuario_id);
-        $c->setComentarios($dados->comentarios);
+        $c->setParecerId($dados['parecer_id'] ?? $dados['parecerId'] ?? null);
+        $c->setUsuarioId($dados['usuario_id'] ?? $dados['usuarioId'] ?? null);
+        $c->setComentarios($dados['comentarios'] ?? $dados['comentario'] ?? '');
         return $this->dao->editar($id, $c);
     }
 
