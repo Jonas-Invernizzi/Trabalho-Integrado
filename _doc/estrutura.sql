@@ -25,7 +25,7 @@ CREATE TABLE `SERVIDORES` (
   `nome` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL UNIQUE,
   `telefone` VARCHAR(20),
-  `tipo` ENUM('Docente', 'TAE', 'NAPNE', 'Outro') NOT NULL
+  `tipo` ENUM('Docente', 'Pedagógico', 'NAPNE', 'Outro') NOT NULL
 );
 
 CREATE TABLE `USUARIOS` (
