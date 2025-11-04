@@ -18,22 +18,33 @@ class ParecerController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $p = new Parecer();
-        $p->setPeiAdaptacaoId($_POST['pei_adaptacao_id']);
-        $p->setPeriodo($_POST['periodo']);
-        $p->setDescricao($_POST['descricao']);
-        $p->setComentarios($_POST['comentarios']);
+        $p->setPeiAdaptacaoId($dados['pei_adaptacao_id'] ?? $dados['peiAdaptacaoId'] ?? null);
+        $p->setPeriodo($dados['periodo'] ?? '');
+        $p->setDescricao($dados['descricao'] ?? '');
+        $p->setComentarios($dados['comentarios'] ?? '');
         return $this->dao->inserir($p);
     }
 
     function editar($id) {
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $p = new Parecer();
-        $p->setPeiAdaptacaoId($dados->pei_adaptacao_id);
-        $p->setPeriodo($dados->periodo);
-        $p->setDescricao($dados->descricao);
-        $p->setComentarios($dados->comentarios);
+        $p->setPeiAdaptacaoId($dados['pei_adaptacao_id'] ?? $dados['peiAdaptacaoId'] ?? null);
+        $p->setPeriodo($dados['periodo'] ?? '');
+        $p->setDescricao($dados['descricao'] ?? '');
+        $p->setComentarios($dados['comentarios'] ?? '');
         return $this->dao->editar($id, $p);
     }
 

@@ -21,9 +21,16 @@ class RespEstudanteController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $re = new RespEstudante();
-        $re->setIdResponsavel($_POST['id_responsavel']);
-        $re->setIdAluno($_POST['id_aluno']);
+        $re->setIdResponsavel($dados['id_responsavel'] ?? $dados['idResponsavel'] ?? null);
+        $re->setIdAluno($dados['id_aluno'] ?? $dados['idAluno'] ?? null);
         return $this->dao->inserir($re);
     }
 
@@ -32,11 +39,15 @@ class RespEstudanteController implements Controller {
         $ids = explode('-', $id);
         $ids_array = ['id_responsavel' => $ids[0], 'id_aluno' => $ids[1]];
         
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $re = new RespEstudante();
-        $re->setIdResponsavel($dados->id_responsavel);
-        $re->setIdAluno($dados->id_aluno);
+        $re->setIdResponsavel($dados['id_responsavel'] ?? $dados['idResponsavel'] ?? null);
+        $re->setIdAluno($dados['id_aluno'] ?? $dados['idAluno'] ?? null);
         return $this->dao->editar($ids_array, $re);
     }
 

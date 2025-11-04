@@ -37,11 +37,22 @@ class UsuarioController implements Controller {
     }
 
     function editar($id) {
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $u = new Usuario();
-        $u->setUsername($dados->username);
-        $u->setSenha($dados->senha);
+        $u->setSiape($id); // Manter o siape original
+        $u->setUsername($dados['username'] ?? '');
+        
+        // Se vier senha, fazer hash; caso contrário, manter a atual
+        if (isset($dados['senha']) || isset($dados['password'])) {
+            $senha = $dados['senha'] ?? $dados['password'] ?? '';
+            $u->setSenha(password_hash($senha, PASSWORD_DEFAULT));
+        }
+        
         return $this->dao->editar($id, $u);
     }
 

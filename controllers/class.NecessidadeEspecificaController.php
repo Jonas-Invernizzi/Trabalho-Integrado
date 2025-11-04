@@ -18,18 +18,29 @@ class NecessidadeEspecificaController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $n = new NecessidadeEspecifica();
-        $n->setNome($_POST['nome']);
-        $n->setDescricao($_POST['descricao']);
+        $n->setNome($dados['nome'] ?? $dados['name'] ?? '');
+        $n->setDescricao($dados['descricao'] ?? $dados['description'] ?? '');
         return $this->dao->inserir($n);
     }
 
     function editar($id) {
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $n = new NecessidadeEspecifica();
-        $n->setNome($dados->nome);
-        $n->setDescricao($dados->descricao);
+        $n->setNome($dados['nome'] ?? $dados['name'] ?? '');
+        $n->setDescricao($dados['descricao'] ?? $dados['description'] ?? '');
         return $this->dao->editar($id, $n);
     }
 

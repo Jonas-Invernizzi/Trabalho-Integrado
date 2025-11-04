@@ -20,9 +20,17 @@ class EstudanteNecessidadeController implements Controller {
     }
     
     function criar() {
+        // Aceitar tanto POST quanto JSON
+        $dados = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
+        
         $en = new EstudanteNecessidade();
-        $en->setEstudanteCpf($_POST['estudante_cpf']);
-        $en->setNecessidadeId($_POST['necessidade_id']);
+        $cpf = str_replace(['.', '-'], '', $dados['estudante_cpf'] ?? $dados['estudanteCpf'] ?? '');
+        $en->setEstudanteCpf($cpf);
+        $en->setNecessidadeId($dados['necessidade_id'] ?? $dados['necessidadeId'] ?? null);
         return $this->dao->inserir($en);
     }
 
@@ -30,11 +38,16 @@ class EstudanteNecessidadeController implements Controller {
         $ids = explode('-', $id);
         $ids_array = ['estudante_cpf' => $ids[0], 'necessidade_id' => $ids[1]];
         
-        $dados = json_decode(file_get_contents('php://input'));
+        $dados = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$dados) {
+            throw new Exception('Dados inválidos');
+        }
         
         $en = new EstudanteNecessidade();
-        $en->setEstudanteCpf($dados->estudante_cpf);
-        $en->setNecessidadeId($dados->necessidade_id);
+        $cpf = str_replace(['.', '-'], '', $dados['estudante_cpf'] ?? $dados['estudanteCpf'] ?? '');
+        $en->setEstudanteCpf($cpf);
+        $en->setNecessidadeId($dados['necessidade_id'] ?? $dados['necessidadeId'] ?? null);
         return $this->dao->editar($ids_array, $en);
     }
 

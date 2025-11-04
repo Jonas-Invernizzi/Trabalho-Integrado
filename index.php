@@ -37,7 +37,13 @@ function converterNomeController($palavra) {
 
 function error($msg, $code = 404) {
     http_response_code($code);
-    die(json_encode(['error' => $msg]));
+    $json = json_encode(['error' => $msg], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($json === false) {
+        // Fallback se JSON encoding falhar
+        header('Content-Type: text/plain; charset=utf-8');
+        die('{"error":"Erro ao processar resposta"}');
+    }
+    die($json);
 }
 
 spl_autoload_register(function($nomeDaClasse){
@@ -76,26 +82,45 @@ $nomeDoController = converterNomeController($partes[0]);
 $controller = new $nomeDoController();
 
 try {
+    $resultado = null;
     switch($method) {
         case 'GET':         
-            echo json_encode(
-                (count($partes) === 1) 
+            $resultado = (count($partes) === 1) 
                 ? $controller->getTodos() 
-                : $controller->getPorId($partes[1]));
+                : $controller->getPorId($partes[1]);
             break;
         case 'POST': 
-            echo json_encode($controller->criar());
+            $resultado = $controller->criar();
             break;
         case 'PUT': 
-            echo json_encode($controller->editar($partes[1]));
+            $resultado = $controller->editar($partes[1]);
             break;
         case 'DELETE':  
-            echo json_encode($controller->apagar($partes[1]));
+            $resultado = $controller->apagar($partes[1]);
             break;
-        default: die('Método inválido!');
+        default: 
+            error('Método inválido!', 405);
+            return;
     }
+    
+    // Garantir que sempre retorna JSON válido
+    if ($resultado === null) {
+        $resultado = [];
+    }
+    
+    $json = json_encode($resultado, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    
+    if ($json === false) {
+        error('Erro ao serializar resposta: ' . json_last_error_msg(), 500);
+        return;
+    }
+    
+    echo $json;
+    
 }catch(Exception $e) {
-    error($e->getMessage());
+    error($e->getMessage(), 500);
+}catch(Error $e) {
+    error('Erro interno: ' . $e->getMessage(), 500);
 }
 
 
