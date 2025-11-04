@@ -1,5 +1,0 @@
-# Alias para conectar ao MySQL do XAMPP
-alias mysqlxampp='/Applications/XAMPP/xamppfiles/bin/mysql -u root --socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
-alias mysqlxampp-napne='/Applications/XAMPP/xamppfiles/bin/mysql -u root --socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock NAPNE'
-
-

@@ -20,4 +20,13 @@ Thumbs.db
 # Arquivos temporários
 *.tmp
 *.cache
+*.bak
+
+# Arquivos de teste
+test-*.php
+verificar-*.php
+*-test.php
+
+# Arquivos de configuração temporária
+zshrc-*.txt
 
