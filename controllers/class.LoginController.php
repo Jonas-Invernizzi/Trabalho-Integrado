@@ -14,8 +14,7 @@ class LoginController {
             'exp' => time() + 1 * 60 
         ];
         
-        if ($dados->email === "thyago@email.com" &&
-        $dados->senha === "123") {
+        if ($dados->email === "thyago@email.com" && $dados->senha === "123") {
             $payload['userId'] = 3;
 
             $jwt = JWT::encode($payload, $key, 'HS256');
