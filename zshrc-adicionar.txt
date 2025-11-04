@@ -1,0 +1,25 @@
+
+# ============================================
+# Aliases para XAMPP MySQL
+# ============================================
+# Conectar ao MySQL do XAMPP
+alias mysqlxampp='/Applications/XAMPP/xamppfiles/bin/mysql -u root --socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
+
+# Conectar ao banco NAPNE diretamente
+alias mysqlxampp-napne='/Applications/XAMPP/xamppfiles/bin/mysql -u root --socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock NAPNE'
+
+# Gerenciar MySQL do XAMPP
+alias mysqlxampp-start='sudo /Applications/XAMPP/xamppfiles/xampp startmysql'
+alias mysqlxampp-stop='sudo /Applications/XAMPP/xamppfiles/xampp stopmysql'
+alias mysqlxampp-restart='sudo /Applications/XAMPP/xamppfiles/xampp restartmysql'
+
+# Gerenciar Apache do XAMPP
+alias xampp-start='sudo /Applications/XAMPP/xamppfiles/xampp start'
+alias xampp-stop='sudo /Applications/XAMPP/xamppfiles/xampp stop'
+alias xampp-restart='sudo /Applications/XAMPP/xamppfiles/xampp restart'
+alias xampp-status='sudo /Applications/XAMPP/xamppfiles/xampp status'
+
+# Adicionar XAMPP ao PATH (opcional - facilita acesso aos binários)
+export PATH="/Applications/XAMPP/xamppfiles/bin:$PATH"
+
+
